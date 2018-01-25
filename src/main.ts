@@ -22,8 +22,10 @@ let square: Square;
 let cube: Cube;
 
 let currentShader: ShaderProgram;
-let lambert: ShaderProgram;
-let cool: ShaderProgram;
+let lambertShader: ShaderProgram;
+let coolShader: ShaderProgram;
+let planetShader: ShaderProgram;
+let liquidShader: ShaderProgram;
 
 let startTime: number;
 
@@ -41,25 +43,27 @@ function changeColor(hex: string) {
   rgb.r /= 255.0;
   rgb.g /= 255.0;
   rgb.b /= 255.0;
-  lambert.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
-  cool.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
+  lambertShader.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
+  coolShader.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
 }
 
 function changeShaderProgram(program: string) {
   if (program == "Lambert") {
-    currentShader = lambert;
+    currentShader = lambertShader;
   } else if (program == "Cool") {
-    currentShader = cool;
+    currentShader = coolShader;
+  } else if(program == "Planet") {
+    currentShader = planetShader;
   }
 }
 
 function loadScene() {
-  //icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
-  //icosphere.create();
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 6);
+  icosphere.create();
   // square = new Square(vec3.fromValues(0, 0, 0));
   // square.create();
-   cube = new Cube(vec3.fromValues(0,0,0));
-   cube.create();
+  //  cube = new Cube(vec3.fromValues(0,0,0));
+  //  cube.create();
 }
 
 function main() {
@@ -73,9 +77,10 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 8).step(1);
+  gui.add(controls, 'tesselations', 0, 9).step(1);
   gui.add(controls, 'Load Scene');
-  gui.add({'Shader': 'Cool'}, 'Shader', { 'Lambert': 'Lambert', 'Cool': 'Cool' }).onChange(changeShaderProgram);
+  gui.add({'Shader': 'Planet'}, 'Shader', 
+    { 'Lambert': 'Lambert', 'Cool': 'Cool', 'Planet': 'Planet' }).onChange(changeShaderProgram);
   gui.addColor({'Lambert Color': "#1861b3" }, 'Lambert Color').onChange(changeColor);
 
   // get canvas and webgl context
@@ -97,17 +102,30 @@ function main() {
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
   gl.enable(gl.DEPTH_TEST);
 
-  lambert = new ShaderProgram([
+  lambertShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
-  cool = new ShaderProgram([
+  coolShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/cool-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/cool-frag.glsl')),
   ]);
 
-  currentShader = cool;
+  planetShader = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
+  ]);
+
+  liquidShader = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/liquid-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
+  ]);
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  currentShader = planetShader;
 
   startTime = Date.now();
 
@@ -119,11 +137,8 @@ function main() {
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    renderer.render(camera, currentShader, [
-      //icosphere,
-      //square,
-      cube
-    ]);
+    renderer.render(camera, currentShader, [icosphere]);
+    renderer.render(camera, liquidShader, [icosphere]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
