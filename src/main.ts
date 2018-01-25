@@ -59,7 +59,7 @@ function changeShaderProgram(program: string) {
 }
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 8);
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 9);
   icosphere.create();
   // square = new Square(vec3.fromValues(0, 0, 0));
   // square.create();
@@ -123,10 +123,10 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
   ]);
 
-  atmosphereShader = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/atmosphere-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
-  ]);
+  // atmosphereShader = new ShaderProgram([
+  //   new Shader(gl.VERTEX_SHADER, require('./shaders/atmosphere-vert.glsl')),
+  //   new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
+  // ]);
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

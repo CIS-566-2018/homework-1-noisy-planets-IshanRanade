@@ -35,6 +35,8 @@ out vec4 fs_Nor;            // The array of normals that has been transformed by
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
 
+flat out int fs_CityLight;
+
 float rand(vec2 n) { 
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
@@ -246,4 +248,6 @@ void main()
   fs_LightVec = modelposition - lightPos;
 
   gl_Position = u_ViewProj * modelposition;
+
+  fs_CityLight = 0;
 }

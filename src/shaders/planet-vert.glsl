@@ -35,6 +35,8 @@ out vec4 fs_Nor;            // The array of normals that has been transformed by
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
 
+flat out int fs_CityLight;
+
 mat4 rotationMatrix(vec3 axis, float angle) {
     axis = normalize(axis);
     float s = sin(angle);
@@ -52,6 +54,23 @@ vec3 rotateVec3(vec3 v, vec3 axis, float angle) {
 	return (m * vec4(v, 1.0)).xyz;
 }
 
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+
+
+float rand(vec2 n) { 
+	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float noise(vec2 p){
+	vec2 ip = floor(p);
+	vec2 u = fract(p);
+	u = u*u*(3.0-2.0*u);
+	
+	float res = mix(
+		mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
+		mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
+	return res*res;
+}
 
 
 
@@ -400,30 +419,14 @@ void main()
 
   gl_Position = u_ViewProj * modelposition;
 
-  /*
-  float f0 = turbulence(newPos[0], newPos[1], newPos[2], 3.0f);
-  float epsilon = 0.1f;
-  vec3 dF = vec3(turbulence(newPos[0] + epsilon, newPos[1], newPos[2], 4.0f) / epsilon,
-                 turbulence(newPos[0], newPos[1] + epsilon, newPos[2], 10.0f) / epsilon,
-                 turbulence(newPos[0], newPos[1], newPos[2] + epsilon, 1.0f) / epsilon);
-  fs_Nor = normalize(vs_Nor - vec4(dF, 1.0f));
-  */
 
-  // Calculate the normals
-  float epsilon = 0.005f;
-  vec4 newNormal = normalize(vec4(
-                          (customHeight(vs_Pos - vec4(epsilon,0,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(epsilon,0,0,0)) + 1.0f) / 2.0f,
-                          (customHeight(vs_Pos - vec4(0,epsilon,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(0,epsilon,0,0)) + 1.0f) / 2.0f,
-                          (customHeight(vs_Pos - vec4(0,0,epsilon,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(0,0,epsilon,0)) + 1.0f) / 2.0f,
-                          0.0f
-                       ));
-  //fs_Col = vec4(invTranspose * vec3(vs_Nor), 0);
   fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
-  //fs_Nor += turbulence(newNormal[0], newNormal[1], newNormal[2], 10.0f);
-  //fs_Nor = vec4(0,1,0,0);
-  //fs_Nor = vec4(invTranspose * vec3(newNormal), 0);
-  //fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
 
-  ///fs_Nor = vec4(invTranspose * vec3(normalize(vs_Nor - noise(vec3(vs_Pos)))), 0);
-  //fs_Nor = vec4(normalize(vs_Nor.xyz - (noise(vec3(vs_Pos))) * 0.8), 0);
+  if(vs_Nor[2] < 0.0f) {
+    if(noiseLevel > waterLevel + 0.2) {
+      if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.5f) {
+        fs_LightVec = fs_Nor;
+      }
+    }
+  }
 }
