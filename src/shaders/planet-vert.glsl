@@ -37,6 +37,9 @@ out vec4 fs_Col;            // The color of each vertex. This is implicitly pass
 
 flat out int fs_CityLight;
 
+flat out int fs_Water;
+out vec4 fs_Pos;
+
 mat4 rotationMatrix(vec3 axis, float angle) {
     axis = normalize(axis);
     float s = sin(angle);
@@ -418,6 +421,8 @@ void main()
 
   vec4 modelposition = u_Model * newPos;
 
+  fs_Pos = modelposition;
+
   vec4 lightPos = vec4(0,0,-15,1);
 
   fs_LightVec = modelposition - lightPos;
@@ -448,4 +453,6 @@ void main()
       }
     }
   }
+
+  fs_Water = 0;
 }

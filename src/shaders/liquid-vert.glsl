@@ -35,7 +35,12 @@ out vec4 fs_Nor;            // The array of normals that has been transformed by
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
 
+
+
 flat out int fs_CityLight;
+
+flat out int fs_Water;
+out vec4 fs_Pos;
 
 float rand(vec2 n) { 
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -206,13 +211,8 @@ vec4 peakColor = vec4(153, 102, 0, 255.0) / 255.0;
 vec4 lowestLevelColor = vec4(0,0,0,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
 
-void main()
-{
-  fs_Col = landColor;
 
-  mat3 invTranspose = mat3(u_ModelInvTr);
-  fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
-
+float customHeight(vec4 pos) {
   float f = 2.0;
   float a = 2.0;
 
@@ -226,11 +226,23 @@ void main()
   float n8 = 0.025 * a * (perlin3DNoise(40.0f * f * vs_Pos));
   float n9 = 0.0125 * a * (perlin3DNoise(50.0f * f * vs_Pos));
   float n10 = 0.0075 * a * (perlin3DNoise(64.0f * f * vs_Pos));
-  float n11 = 0.02 * a * (perlin3DNoise(45.0f * f * vs_Pos));
 
-  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10 + n11) / 11.0f;
+  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10) / 10.0f;
 
-  float noiseLevel = e;
+  return e;
+}
+
+
+
+void main()
+{
+  fs_Col = landColor;
+  
+
+  mat3 invTranspose = mat3(u_ModelInvTr);
+  fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
+
+  float noiseLevel = customHeight(vs_Pos);
 
   float waterLevel = 0.0f;
   float y = 0.01f * sin(vs_Pos[2]) + 0.01f * sin(vs_Pos[2]) + 0.01f * cos(float(u_Time)/300.0f);
@@ -243,6 +255,8 @@ void main()
 
   vec4 modelposition = u_Model * newPos;
 
+  fs_Pos = modelposition;
+
   vec4 lightPos = vec4(0,0,-15,1);
 
   fs_LightVec = modelposition - lightPos;
@@ -250,4 +264,6 @@ void main()
   gl_Position = u_ViewProj * modelposition;
 
   fs_CityLight = 0;
+
+  fs_Water = 1;
 }
