@@ -35,6 +35,16 @@ out vec4 fs_Nor;            // The array of normals that has been transformed by
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
 
+float rand(vec2 n) { 
+	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float noise(vec2 n) {
+	const vec2 d = vec2(0.0, 1.0);
+  vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+	return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
+}
+
 mat4 rotationMatrix(vec3 axis, float angle) {
     axis = normalize(axis);
     float s = sin(angle);
@@ -50,106 +60,6 @@ mat4 rotationMatrix(vec3 axis, float angle) {
 vec3 rotateVec3(vec3 v, vec3 axis, float angle) {
 	mat4 m = rotationMatrix(axis, angle);
 	return (m * vec4(v, 1.0)).xyz;
-}
-
-
-
-
-vec3 random3(vec3 c) {
-	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
-	vec3 r;
-	r.z = fract(512.0*j);
-	j *= .125;
-	r.x = fract(512.0*j);
-	j *= .125;
-	r.y = fract(512.0*j);
-	return r-0.5;
-}
-
-const float F3 =  0.3333333;
-const float G3 =  0.1666667;
-float snoise(vec3 p) {
-
-	vec3 s = floor(p + dot(p, vec3(F3)));
-	vec3 x = p - s + dot(s, vec3(G3));
-	 
-	vec3 e = step(vec3(0.0), x - x.yzx);
-	vec3 i1 = e*(1.0 - e.zxy);
-	vec3 i2 = 1.0 - e.zxy*(1.0 - e);
-	 	
-	vec3 x1 = x - i1 + G3;
-	vec3 x2 = x - i2 + 2.0*G3;
-	vec3 x3 = x - 1.0 + 3.0*G3;
-	 
-	vec4 w, d;
-	 
-	w.x = dot(x, x);
-	w.y = dot(x1, x1);
-	w.z = dot(x2, x2);
-	w.w = dot(x3, x3);
-	 
-	w = max(0.6 - w, 0.0);
-	 
-	d.x = dot(random3(s), x);
-	d.y = dot(random3(s + i1), x1);
-	d.z = dot(random3(s + i2), x2);
-	d.w = dot(random3(s + 1.0), x3);
-	 
-	w *= w;
-	w *= w;
-	d *= w;
-	 
-	return dot(d, vec4(52.0));
-}
-
-float snoiseFractal(vec3 m) {
-	return   0.5333333* snoise(m)
-				+0.2666667* snoise(2.0*m)
-				+0.1333333* snoise(4.0*m)
-				+0.0666667* snoise(8.0*m);
-}
-
-
-
-
-
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
-
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
-
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
-}
-
-int NUM_OCTAVES = 5;
-float fbm(vec3 x) {
-	float v = 0.0;
-	float a = 0.5;
-	vec3 shift = vec3(100);
-	for (int i = 0; i < NUM_OCTAVES; ++i) {
-		v += a * noise(x);
-		x = x * 2.0 + shift;
-		a *= 0.5;
-	}
-	return v;
 }
 
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
@@ -289,21 +199,20 @@ float perlin3DNoise(vec4 P){
   return 2.2 * n_xyzw;
 }
 
-float turbulence(float x, float y, float z, float f) {
-  float t = -.5;
-  for ( ; f <= 500.f/12.f ; f *= 2.f) // W = Image width in pixels
-    t += abs(perlin3DNoise(vec4(x,y,z,f)) / f);
-  return t;
-}
-
-vec4 landColor = vec4(0, 153, 51, 255.0) / 255.0;
+vec4 landColor = vec4(0, 102, 34, 255.0) / 255.0;
 vec4 peakColor = vec4(153, 102, 0, 255.0) / 255.0;
-vec4 lowestLevelColor = vec4(0,0,51,255.0) / 255.0;
+vec4 lowestLevelColor = vec4(0,0,0,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
 
+void main()
+{
+  fs_Col = landColor;
 
+  mat3 invTranspose = mat3(u_ModelInvTr);
+  fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
 
-float customHeight(vec4 pos) {
+  vec4 newPos = vs_Pos;
+
   float f = 2.0;
   float a = 2.0;
 
@@ -317,57 +226,18 @@ float customHeight(vec4 pos) {
   float n8 = 0.025 * a * (perlin3DNoise(40.0f * f * vs_Pos));
   float n9 = 0.0125 * a * (perlin3DNoise(50.0f * f * vs_Pos));
   float n10 = 0.0075 * a * (perlin3DNoise(64.0f * f * vs_Pos));
+  float n11 = 0.02 * a * (perlin3DNoise(45.0f * f * vs_Pos));
 
-  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10) / 10.0f;
+  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10 + n11) / 11.0f;
 
-  return e;
-}
-
-
-
-void main()
-{
-  fs_Col = landColor;
-
-  mat3 invTranspose = mat3(u_ModelInvTr);
-
-  vec4 newPos = vs_Pos;
-
-  float noiseLevel = customHeight(vs_Pos);
+  float noiseLevel = e;
 
   float waterLevel = 0.0f;
 
-  if(noiseLevel < waterLevel) {
-    float u = -noiseLevel;
-    fs_Col = sin(u) * lowestLevelColor + (1.0f - sin(u)) * highWaterLevelColor;
-  }
+  float alpha = pow(1.0 - clamp(dot(u_CameraPos, normalize(vec3(vs_Pos))), 0.0f, 1.0f), 5.0f);
+  fs_Col = vec4(1,1,1,alpha);
 
-  if(noiseLevel > waterLevel) {
-    float u = (noiseLevel - waterLevel) / (1.0f - waterLevel);
-    fs_Col = (1.0f - u) * landColor + u * peakColor;
-
-    if(noiseLevel > waterLevel - 0.01) {
-      fs_Col = vec4(230, 230, 0, 255) / 255.0;
-    }
-    if(noiseLevel > waterLevel + 0.02) {
-      fs_Col = vec4(102, 102, 0, 255) / 255.0;
-    }
-    if(noiseLevel > waterLevel + 0.05) {
-      fs_Col = vec4(0, 102, 34, 255) / 255.0;
-    }
-    if(noiseLevel > waterLevel + 0.2) {
-      fs_Col = vec4(140, 140, 140, 255) / 255.0;
-    }
-
-  }
-
-  newPos = vs_Pos + vs_Nor * noiseLevel;
-
-  if(noiseLevel < waterLevel) {
-    newPos = vs_Pos + vs_Nor * noiseLevel;
-  }
-
-  // Now set the color of this point
+  newPos = vs_Pos;
 
   vec4 modelposition = u_Model * newPos;
 
@@ -376,30 +246,4 @@ void main()
   fs_LightVec = modelposition - lightPos;
 
   gl_Position = u_ViewProj * modelposition;
-
-  /*
-  float f0 = turbulence(newPos[0], newPos[1], newPos[2], 3.0f);
-  float epsilon = 0.1f;
-  vec3 dF = vec3(turbulence(newPos[0] + epsilon, newPos[1], newPos[2], 4.0f) / epsilon,
-                 turbulence(newPos[0], newPos[1] + epsilon, newPos[2], 10.0f) / epsilon,
-                 turbulence(newPos[0], newPos[1], newPos[2] + epsilon, 1.0f) / epsilon);
-  fs_Nor = normalize(vs_Nor - vec4(dF, 1.0f));
-  */
-
-  // Calculate the normals
-  float epsilon = 1.0f;
-  vec4 newNormal = normalize(vec4(
-                          (customHeight(vs_Pos - vec4(epsilon,0,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(epsilon,0,0,0)) + 1.0f) / 2.0f,
-                          (customHeight(vs_Pos - vec4(0,epsilon,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(0,epsilon,0,0)) + 1.0f) / 2.0f,
-                          (customHeight(vs_Pos - vec4(0,0,epsilon,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(0,0,epsilon,0)) + 1.0f) / 2.0f,
-                          0.0f
-                       ));
-  //fs_Col = vec4(invTranspose * vec3(vs_Nor), 0);
-  fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
-  //fs_Nor = vec4(0,1,0,0);
-  //fs_Nor = vec4(invTranspose * vec3(newNormal), 0);
-  //fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
-
-  ///fs_Nor = vec4(invTranspose * vec3(normalize(vs_Nor - noise(vec3(vs_Pos)))), 0);
-  //fs_Nor = vec4(normalize(vs_Nor.xyz - (noise(vec3(vs_Pos))) * 0.8), 0);
 }

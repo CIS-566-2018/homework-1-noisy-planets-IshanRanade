@@ -199,7 +199,7 @@ float perlin3DNoise(vec4 P){
   return 2.2 * n_xyzw;
 }
 
-vec4 landColor = vec4(0, 153, 51, 255.0) / 255.0;
+vec4 landColor = vec4(0, 102, 34, 255.0) / 255.0;
 vec4 peakColor = vec4(153, 102, 0, 255.0) / 255.0;
 vec4 lowestLevelColor = vec4(0,0,0,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
@@ -210,8 +210,6 @@ void main()
 
   mat3 invTranspose = mat3(u_ModelInvTr);
   fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
-
-  vec4 newPos = vs_Pos;
 
   float f = 2.0;
   float a = 2.0;
@@ -226,18 +224,20 @@ void main()
   float n8 = 0.025 * a * (perlin3DNoise(40.0f * f * vs_Pos));
   float n9 = 0.0125 * a * (perlin3DNoise(50.0f * f * vs_Pos));
   float n10 = 0.0075 * a * (perlin3DNoise(64.0f * f * vs_Pos));
+  float n11 = 0.02 * a * (perlin3DNoise(45.0f * f * vs_Pos));
 
-  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10) / 10.0f;
+  float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10 + n11) / 11.0f;
 
   float noiseLevel = e;
 
   float waterLevel = 0.0f;
+  float y = 0.01f * sin(vs_Pos[2]) + 0.01f * sin(vs_Pos[2]) + 0.01f * cos(float(u_Time)/300.0f);
+  vec4 newPos = vs_Pos + y * vs_Nor;
 
-  if(noiseLevel <= waterLevel) {
-    fs_Col = vec4(0,0,1,0.7);
+  if(noiseLevel <= waterLevel + y) {
+    float blendLevel = abs(noiseLevel);
+    fs_Col = vec4(0,0,1,0.65);
   }
-
-  newPos = vs_Pos;
 
   vec4 modelposition = u_Model * newPos;
 

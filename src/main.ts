@@ -26,6 +26,7 @@ let lambertShader: ShaderProgram;
 let coolShader: ShaderProgram;
 let planetShader: ShaderProgram;
 let liquidShader: ShaderProgram;
+let atmosphereShader: ShaderProgram;
 
 let startTime: number;
 
@@ -58,7 +59,7 @@ function changeShaderProgram(program: string) {
 }
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 6);
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 8);
   icosphere.create();
   // square = new Square(vec3.fromValues(0, 0, 0));
   // square.create();
@@ -122,6 +123,11 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
   ]);
 
+  atmosphereShader = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/atmosphere-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
+  ]);
+
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -132,6 +138,7 @@ function main() {
   // This function will be called every frame
   function tick() {
     currentShader.setTime(Date.now() - startTime);
+    liquidShader.setTime(Date.now() - startTime);
 
     camera.update();
     stats.begin();
@@ -139,6 +146,7 @@ function main() {
     renderer.clear();
     renderer.render(camera, currentShader, [icosphere]);
     renderer.render(camera, liquidShader, [icosphere]);
+    //renderer.render(camera, atmosphereShader, [icosphere]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
