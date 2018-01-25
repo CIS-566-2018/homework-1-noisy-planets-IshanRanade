@@ -430,7 +430,6 @@ void main()
 
   gl_Position = u_ViewProj * modelposition;
 
-
   fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
 
   float buildingMin = 1.0f;
@@ -441,7 +440,7 @@ void main()
 
         float randomB = rand(vs_Pos[2] * 13.0f + vs_Pos[0] * 27.0f + vs_Pos[1] * 53.0f);
 
-        
+        newPos += vs_Nor * randomB * 0.05;
 
         fs_CityLight = 1;
         fs_LightVec = fs_Nor;
@@ -458,6 +457,16 @@ void main()
         } else {
           fs_Col = vec4(0,1,1,1);
         }
+
+        vec4 modelposition = u_Model * newPos;
+
+        fs_Pos = modelposition;
+
+        vec4 lightPos = vec4(0,0,-15,1);
+
+        gl_Position = u_ViewProj * modelposition;
+
+        fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
       }
     }
   }
