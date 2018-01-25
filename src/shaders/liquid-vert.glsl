@@ -212,20 +212,22 @@ vec4 lowestLevelColor = vec4(0,0,0,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
 
 
+float TIME_SLOW = 10000.0f;
+
 float customHeight(vec4 pos) {
   float f = 2.0;
   float a = 2.0;
 
-  float n1 = 1.5 * a * (perlin3DNoise(f * vs_Pos));
-  float n2 = 0.75 * a * (perlin3DNoise(2.0f * f * vs_Pos));
-  float n3 = 0.25 * a * (perlin3DNoise(4.0f * f * vs_Pos));
-  float n4 = 0.125 * a * (perlin3DNoise(8.0f * f * vs_Pos));
-  float n5 = 0.02 * a * (perlin3DNoise(10.0f * f * vs_Pos));
-  float n6 = 0.1 * a * (perlin3DNoise(16.0f * f * vs_Pos));
-  float n7 = 0.05 * a * (perlin3DNoise(32.0f * f * vs_Pos));
-  float n8 = 0.025 * a * (perlin3DNoise(40.0f * f * vs_Pos));
-  float n9 = 0.0125 * a * (perlin3DNoise(50.0f * f * vs_Pos));
-  float n10 = 0.0075 * a * (perlin3DNoise(64.0f * f * vs_Pos));
+  float n1 = 1.5 * a * (perlin3DNoise(vec4(vec3(f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n2 = 0.75 * a * (perlin3DNoise(vec4(vec3(2.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n3 = 0.25 * a * (perlin3DNoise(vec4(vec3(4.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n4 = 0.125 * a * (perlin3DNoise(vec4(vec3(8.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n5 = 0.02 * a * (perlin3DNoise(vec4(vec3(10.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n6 = 0.1 * a * (perlin3DNoise(vec4(vec3(16.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n7 = 0.05 * a * (perlin3DNoise(vec4(vec3(32.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n8 = 0.025 * a * (perlin3DNoise(vec4(vec3(40.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n9 = 0.0125 * a * (perlin3DNoise(vec4(vec3(50.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n10 = 0.0075 * a * (perlin3DNoise(vec4(vec3(64.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
 
   float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10) / 10.0f;
 

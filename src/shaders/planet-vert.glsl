@@ -333,21 +333,22 @@ vec4 forestColor4 = vec4(0, 26, 9, 255) / 255.0;
 vec4 rockColor = vec4(51, 51, 51, 255) / 255.0;
 
 
+float TIME_SLOW = 10000.0f;
 
 float customHeight(vec4 pos) {
   float f = 2.0;
   float a = 2.0;
 
-  float n1 = 1.5 * a * (perlin3DNoise(f * vs_Pos));
-  float n2 = 0.75 * a * (perlin3DNoise(2.0f * f * vs_Pos));
-  float n3 = 0.25 * a * (perlin3DNoise(4.0f * f * vs_Pos));
-  float n4 = 0.125 * a * (perlin3DNoise(8.0f * f * vs_Pos));
-  float n5 = 0.02 * a * (perlin3DNoise(10.0f * f * vs_Pos));
-  float n6 = 0.1 * a * (perlin3DNoise(16.0f * f * vs_Pos));
-  float n7 = 0.05 * a * (perlin3DNoise(32.0f * f * vs_Pos));
-  float n8 = 0.025 * a * (perlin3DNoise(40.0f * f * vs_Pos));
-  float n9 = 0.0125 * a * (perlin3DNoise(50.0f * f * vs_Pos));
-  float n10 = 0.0075 * a * (perlin3DNoise(64.0f * f * vs_Pos));
+  float n1 = 1.5 * a * (perlin3DNoise(vec4(vec3(f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n2 = 0.75 * a * (perlin3DNoise(vec4(vec3(2.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n3 = 0.25 * a * (perlin3DNoise(vec4(vec3(4.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n4 = 0.125 * a * (perlin3DNoise(vec4(vec3(8.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n5 = 0.02 * a * (perlin3DNoise(vec4(vec3(10.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n6 = 0.1 * a * (perlin3DNoise(vec4(vec3(16.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n7 = 0.05 * a * (perlin3DNoise(vec4(vec3(32.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n8 = 0.025 * a * (perlin3DNoise(vec4(vec3(40.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n9 = 0.0125 * a * (perlin3DNoise(vec4(vec3(50.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
+  float n10 = 0.0075 * a * (perlin3DNoise(vec4(vec3(64.0f * f * vs_Pos), float(u_Time)/TIME_SLOW)));
 
   float e = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + n10) / 10.0f;
 
@@ -432,9 +433,16 @@ void main()
 
   fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
 
+  float buildingMin = 1.0f;
+  float buildingMax = 5.0f;
   if(vs_Nor[2] < 0.0f) {
     if(noiseLevel > waterLevel + 0.2) {
-      if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.5f) {
+      if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.4f) {
+
+        float randomB = rand(vs_Pos[2] * 13.0f + vs_Pos[0] * 27.0f + vs_Pos[1] * 53.0f);
+
+        
+
         fs_CityLight = 1;
         fs_LightVec = fs_Nor;
 
@@ -447,7 +455,7 @@ void main()
           fs_Col = vec4(1,1,0,1);
         } else if(randomN < 0.9f) {
           fs_Col = vec4(1,1,1,1);
-        } else if(randomN < 1.0f) {
+        } else {
           fs_Col = vec4(0,1,1,1);
         }
       }
