@@ -296,10 +296,17 @@ float turbulence(float x, float y, float z, float f) {
   return t;
 }
 
-vec4 landColor = vec4(0, 153, 51, 255.0) / 255.0;
-vec4 peakColor = vec4(153, 102, 0, 255.0) / 255.0;
+
+vec4 grassColor = vec4(0, 153, 51, 255.0) / 255.0;
 vec4 lowestLevelColor = vec4(0,0,51,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
+vec4 mountainTopColor = vec4(204, 221 , 255, 255) / 255.0;
+vec4 mountainCliffColor = vec4(77, 38, 0, 255) / 255.0;
+vec4 beachColor = vec4(255, 255, 179, 255) / 255.0;
+vec4 sandColor = vec4(128, 128, 0, 255) / 255.0;
+vec4 forestColor1 = vec4(0, 102, 34, 255) / 255.0;
+vec4 forestColor2 = vec4(0, 51, 17, 255) / 255.0;
+vec4 rockColor = vec4(51, 51, 51, 255) / 255.0;
 
 
 
@@ -327,8 +334,6 @@ float customHeight(vec4 pos) {
 
 void main()
 {
-  fs_Col = landColor;
-
   mat3 invTranspose = mat3(u_ModelInvTr);
 
   vec4 newPos = vs_Pos;
@@ -343,21 +348,39 @@ void main()
   }
 
   if(noiseLevel > waterLevel) {
-    float u = (noiseLevel - waterLevel) / (1.0f - waterLevel);
-    fs_Col = (1.0f - u) * landColor + u * peakColor;
-
-    if(noiseLevel > waterLevel - 0.01) {
-      fs_Col = vec4(230, 230, 0, 255) / 255.0;
+    if(noiseLevel > waterLevel - 0.04) {
+      fs_Col = beachColor;
     }
-    if(noiseLevel > waterLevel + 0.02) {
-      fs_Col = vec4(102, 102, 0, 255) / 255.0;
+    if(noiseLevel > waterLevel + 0.01 && noiseLevel < waterLevel + 0.02) {
+      float u = (noiseLevel - (waterLevel - 0.01)) / ((waterLevel + 0.02) - (waterLevel - 0.01));
+      fs_Col = (1.0f - u) * beachColor + sandColor;
     }
-    if(noiseLevel > waterLevel + 0.05) {
-      fs_Col = vec4(0, 102, 34, 255) / 255.0;
+    if(noiseLevel > waterLevel + 0.03) {
+      fs_Col = sandColor;
     }
-    if(noiseLevel > waterLevel + 0.2) {
-      fs_Col = vec4(140, 140, 140, 255) / 255.0;
+    if(noiseLevel > waterLevel + 0.045) {
+      fs_Col = grassColor;
     }
+    if(noiseLevel > waterLevel + 0.08) {
+      if(noise(vec3(vs_Pos[1], vs_Pos[2], vs_Pos[0])) > 0.5f) {
+        fs_Col = forestColor1;
+      } else {
+        fs_Col = forestColor2;
+      } 
+      //fs_Col = forestColor2;
+    }
+    if(noiseLevel > waterLevel + 0.16) {
+      float u = (noiseLevel - 0.17) / (0.19 - 0.17);
+      fs_Col = (1.0f - u) * rockColor + u * mountainCliffColor;
+    }
+    if(noiseLevel > waterLevel + 0.19) {
+      float u = (noiseLevel - 0.19f) / (0.25 - 0.19f);
+      fs_Col = (1.0f - u) * mountainCliffColor + u * mountainTopColor;
+    }
+    if(noiseLevel > waterLevel + 0.25) {
+      fs_Col = mountainTopColor;
+    }
+    
 
   }
 
@@ -387,7 +410,7 @@ void main()
   */
 
   // Calculate the normals
-  float epsilon = 1.0f;
+  float epsilon = 0.005f;
   vec4 newNormal = normalize(vec4(
                           (customHeight(vs_Pos - vec4(epsilon,0,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(epsilon,0,0,0)) + 1.0f) / 2.0f,
                           (customHeight(vs_Pos - vec4(0,epsilon,0,0)) + 1.0f) / 2.0f - (customHeight(vs_Pos + vec4(0,epsilon,0,0)) + 1.0f) / 2.0f,
@@ -396,6 +419,7 @@ void main()
                        ));
   //fs_Col = vec4(invTranspose * vec3(vs_Nor), 0);
   fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
+  //fs_Nor += turbulence(newNormal[0], newNormal[1], newNormal[2], 10.0f);
   //fs_Nor = vec4(0,1,0,0);
   //fs_Nor = vec4(invTranspose * vec3(newNormal), 0);
   //fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
