@@ -56,9 +56,6 @@ void main()
     vec4 diffuseColor = fs_Col;
 
     vec4 lightVec = fs_LightVec;
-    /*if(noise(vec3(gl_FragCoord[0], gl_FragCoord[2], gl_FragCoord[3])) > 0.1f && fs_CityLight == 1) {
-      lightVec = fs_Nor;
-    }*/
 
     // Calculate the diffuse term for Lambert shading
     float diffuseTerm = dot(normalize(fs_Nor), normalize(lightVec));

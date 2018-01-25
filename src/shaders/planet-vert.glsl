@@ -430,7 +430,21 @@ void main()
   if(vs_Nor[2] < 0.0f) {
     if(noiseLevel > waterLevel + 0.2) {
       if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.5f) {
+        fs_CityLight = 1;
         fs_LightVec = fs_Nor;
+
+        float randomN = rand(vs_Pos[1] * 13.0f + vs_Pos[0] * 27.0f + vs_Pos[2] * 53.0f);
+        if(randomN < 0.1f) {
+          fs_Col = vec4(1,0,0,1);
+        } else if(randomN < 0.3f) {
+          fs_Col = vec4(1,1,0,1);
+        } else if(randomN < 0.5f) {
+          fs_Col = vec4(1,1,0,1);
+        } else if(randomN < 0.9f) {
+          fs_Col = vec4(1,1,1,1);
+        } else if(randomN < 1.0f) {
+          fs_Col = vec4(0,1,1,1);
+        }
       }
     }
   }
