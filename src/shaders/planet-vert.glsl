@@ -324,7 +324,9 @@ vec4 mountainCliffColor = vec4(77, 38, 0, 255) / 255.0;
 vec4 beachColor = vec4(255, 255, 179, 255) / 255.0;
 vec4 sandColor = vec4(128, 128, 0, 255) / 255.0;
 vec4 forestColor1 = vec4(0, 102, 34, 255) / 255.0;
-vec4 forestColor2 = vec4(0, 51, 17, 255) / 255.0;
+vec4 forestColor2 = vec4(0, 128, 43, 255) / 255.0;
+vec4 forestColor3 = vec4(0, 51, 17, 255) / 255.0;
+vec4 forestColor4 = vec4(0, 26, 9, 255) / 255.0;
 vec4 rockColor = vec4(51, 51, 51, 255) / 255.0;
 
 
@@ -378,15 +380,18 @@ void main()
       fs_Col = sandColor;
     }
     if(noiseLevel > waterLevel + 0.045) {
-      fs_Col = grassColor;
-    }
-    if(noiseLevel > waterLevel + 0.08) {
-      if(noise(vec3(vs_Pos[1], vs_Pos[2], vs_Pos[0])) > 0.5f) {
+      if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.5f) {
         fs_Col = forestColor1;
       } else {
         fs_Col = forestColor2;
-      } 
-      //fs_Col = forestColor2;
+      }
+    }
+    if(noiseLevel > waterLevel + 0.08) {
+      if(rand(vs_Pos[2] * 7.0f + vs_Pos[1] * 13.0f + vs_Pos[0] * 29.0f) > 0.5f) {
+        fs_Col = forestColor3;
+      } else {
+        fs_Col = forestColor4;
+      }
     }
     if(noiseLevel > waterLevel + 0.16) {
       float u = (noiseLevel - 0.17) / (0.19 - 0.17);

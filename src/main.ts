@@ -59,7 +59,7 @@ function changeShaderProgram(program: string) {
 }
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 9);
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 8);
   icosphere.create();
   // square = new Square(vec3.fromValues(0, 0, 0));
   // square.create();
