@@ -22,6 +22,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
 uniform int u_Time;
 uniform float u_TimeSpeed;
 uniform float u_WaterBobbingVariance;
+uniform float u_WaterLevel;
 
 uniform vec3 u_LiquidColor;
 
@@ -251,7 +252,7 @@ void main()
 
   float waterLevel = 0.0f;
   float y = 0.01f * cos(float(u_Time)/300.0f);
-  vec4 newPos = vs_Pos + y * float(u_WaterBobbingVariance) * vs_Nor;
+  vec4 newPos = vs_Pos + y * float(u_WaterBobbingVariance) * vs_Nor + u_WaterLevel / 25.0f * vs_Nor;
 
   if(noiseLevel <= waterLevel + y + 1.0f) {
     float blendLevel = abs(noiseLevel);
