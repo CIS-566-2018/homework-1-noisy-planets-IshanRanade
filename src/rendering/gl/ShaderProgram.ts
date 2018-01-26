@@ -21,8 +21,6 @@ export class Shader {
 class ShaderProgram {
   prog: WebGLProgram;
 
-  color: vec4
-
   attrPos: number;
   attrNor: number;
   attrCol: number;
@@ -34,11 +32,10 @@ class ShaderProgram {
   unifTime: WebGLUniformLocation;
   unifCameraPos: WebGLUniformLocation;
   unifTimeSpeed: WebGLUniformLocation;
+  unifLiquidColor: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
-
-    this.color = vec4.fromValues(1,0,0,1);
 
     for (let shader of shaders) {
       gl.attachShader(this.prog, shader.shader);
@@ -51,17 +48,14 @@ class ShaderProgram {
     this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
-    this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
-    this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
-    this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
-    this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
-    this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
-    this.unifCameraPos  = gl.getUniformLocation(this.prog, "u_CameraPos");
-    this.unifTimeSpeed  = gl.getUniformLocation(this.prog, "u_TimeSpeed");
-  }
-
-  changeColor(color: vec4) {
-    this.color = color;
+    this.unifModel       = gl.getUniformLocation(this.prog, "u_Model");
+    this.unifModelInvTr  = gl.getUniformLocation(this.prog, "u_ModelInvTr");
+    this.unifViewProj    = gl.getUniformLocation(this.prog, "u_ViewProj");
+    this.unifColor       = gl.getUniformLocation(this.prog, "u_Color");
+    this.unifTime        = gl.getUniformLocation(this.prog, "u_Time");
+    this.unifCameraPos   = gl.getUniformLocation(this.prog, "u_CameraPos");
+    this.unifTimeSpeed   = gl.getUniformLocation(this.prog, "u_TimeSpeed");
+    this.unifLiquidColor = gl.getUniformLocation(this.prog, 'u_LiquidColor');
   }
 
   use() {
@@ -117,6 +111,13 @@ class ShaderProgram {
     this.use();
     if (this.unifTimeSpeed !== -1) {
       gl.uniform1i(this.unifTimeSpeed, timeSpeed);
+    }
+  }
+
+  setLiquidColor(color: vec3) {
+    this.use();
+    if(this.unifLiquidColor !== -1) {
+      gl.uniform3fv(this.unifLiquidColor, color);
     }
   }
 

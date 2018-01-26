@@ -22,6 +22,8 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
 uniform int u_Time;
 uniform int u_TimeSpeed;
 
+uniform vec3 u_LiquidColor;
+
 uniform vec4 u_Color;
 
 uniform vec3 u_CameraPos;
@@ -252,7 +254,7 @@ void main()
 
   if(noiseLevel <= waterLevel + y) {
     float blendLevel = abs(noiseLevel);
-    fs_Col = vec4(0,0,1,0.65);
+    fs_Col = vec4(u_LiquidColor,0.65);
   }
 
   vec4 modelposition = u_Model * newPos;

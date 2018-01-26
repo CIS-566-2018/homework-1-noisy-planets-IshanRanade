@@ -16,6 +16,7 @@ const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
   Time: 1.0,
+  'Liquid Color': [0,0,255],
 };
 
 let icosphere: Icosphere;
@@ -40,13 +41,12 @@ function hexToRgb(hex: string) {
   } : null;
 }
 
-function changeColor(hex: string) {
+function changeLiquidColor(hex: string) {
   let rgb = hexToRgb(hex);
   rgb.r /= 255.0;
   rgb.g /= 255.0;
   rgb.b /= 255.0;
-  lambertShader.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
-  coolShader.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
+  liquidShader.setLiquidColor(vec3.fromValues(rgb.r,rgb.g,rgb.b));
 }
 
 function loadScene() {
@@ -75,6 +75,7 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'Time', 1, 10).onChange(changeTimeSpeed);
+  gui.addColor({'Liquid Color': '#0000FF'}, 'Liquid Color').onChange(changeLiquidColor);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -114,6 +115,8 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/liquid-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
   ]);
+
+  liquidShader.setLiquidColor(vec3.fromValues(0,0,1));
 
   // atmosphereShader = new ShaderProgram([
   //   new Shader(gl.VERTEX_SHADER, require('./shaders/atmosphere-vert.glsl')),
