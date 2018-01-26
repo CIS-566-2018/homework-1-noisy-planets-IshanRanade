@@ -17,6 +17,7 @@ const controls = {
   'Load Scene': loadScene, // A function pointer, essentially
   Time: 1.0,
   'Liquid Color': [0,0,255],
+  'Water Bobbing': 1,
 };
 
 let icosphere: Icosphere;
@@ -63,6 +64,10 @@ function changeTimeSpeed(time: number) {
   liquidShader.setTimeSpeed(time);
 }
 
+function changeWaterBobbingVariance(variance: number) {
+  liquidShader.setWaterBobbingVariance(variance);
+}
+
 function main() {
   // Initial display for framerate
   const stats = Stats();
@@ -76,6 +81,7 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'Time', 1, 10).onChange(changeTimeSpeed);
   gui.addColor({'Liquid Color': '#0000FF'}, 'Liquid Color').onChange(changeLiquidColor);
+  gui.add(controls, 'Water Bobbing', 1, 10).onChange(changeWaterBobbingVariance);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');

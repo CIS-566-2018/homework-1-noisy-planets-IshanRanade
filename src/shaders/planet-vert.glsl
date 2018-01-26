@@ -20,7 +20,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform int u_Time;
-uniform int u_TimeSpeed;
+uniform float u_TimeSpeed;
 
 uniform vec4 u_Color;
 

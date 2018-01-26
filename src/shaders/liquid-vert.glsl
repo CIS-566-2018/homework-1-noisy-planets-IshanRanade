@@ -20,7 +20,8 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform int u_Time;
-uniform int u_TimeSpeed;
+uniform float u_TimeSpeed;
+uniform float u_WaterBobbingVariance;
 
 uniform vec3 u_LiquidColor;
 
@@ -249,10 +250,10 @@ void main()
   float noiseLevel = customHeight(vs_Pos);
 
   float waterLevel = 0.0f;
-  float y = 0.01f * sin(vs_Pos[2]) + 0.01f * sin(vs_Pos[2]) + 0.01f * cos(float(u_Time)/300.0f);
-  vec4 newPos = vs_Pos + y * vs_Nor;
+  float y = 0.01f * cos(float(u_Time)/300.0f);
+  vec4 newPos = vs_Pos + y * float(u_WaterBobbingVariance) * vs_Nor;
 
-  if(noiseLevel <= waterLevel + y) {
+  if(noiseLevel <= waterLevel + y + 1.0f) {
     float blendLevel = abs(noiseLevel);
     fs_Col = vec4(u_LiquidColor,0.65);
   }

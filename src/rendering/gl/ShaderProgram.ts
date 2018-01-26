@@ -33,6 +33,7 @@ class ShaderProgram {
   unifCameraPos: WebGLUniformLocation;
   unifTimeSpeed: WebGLUniformLocation;
   unifLiquidColor: WebGLUniformLocation;
+  unifWaterBobbingVariance: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -56,6 +57,7 @@ class ShaderProgram {
     this.unifCameraPos   = gl.getUniformLocation(this.prog, "u_CameraPos");
     this.unifTimeSpeed   = gl.getUniformLocation(this.prog, "u_TimeSpeed");
     this.unifLiquidColor = gl.getUniformLocation(this.prog, 'u_LiquidColor');
+    this.unifWaterBobbingVariance = gl.getUniformLocation(this.prog, 'u_WaterBobbingVariance');
   }
 
   use() {
@@ -110,7 +112,7 @@ class ShaderProgram {
   setTimeSpeed(timeSpeed: number) {
     this.use();
     if (this.unifTimeSpeed !== -1) {
-      gl.uniform1i(this.unifTimeSpeed, timeSpeed);
+      gl.uniform1f(this.unifTimeSpeed, timeSpeed);
     }
   }
 
@@ -118,6 +120,13 @@ class ShaderProgram {
     this.use();
     if(this.unifLiquidColor !== -1) {
       gl.uniform3fv(this.unifLiquidColor, color);
+    }
+  }
+
+  setWaterBobbingVariance(waterBobbingVariance: number) {
+    this.use();
+    if(this.unifWaterBobbingVariance !== -1) {
+      gl.uniform1f(this.unifWaterBobbingVariance, waterBobbingVariance);
     }
   }
 
