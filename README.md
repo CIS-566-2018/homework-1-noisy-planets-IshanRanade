@@ -3,7 +3,8 @@
 
 ## Ishan Ranade (ish2017)
 
-![](danPlanet.png)
+![](shot1.png)
+![](shot2.png)
 
 ## Overview
 This project demonstrates a procedurally created and procedurally modified planet.
