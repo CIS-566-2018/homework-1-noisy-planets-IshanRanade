@@ -20,6 +20,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform int u_Time;
+uniform int u_TimeSpeed;
 
 uniform vec4 u_Color;
 
@@ -212,9 +213,8 @@ vec4 lowestLevelColor = vec4(0,0,0,255.0) / 255.0;
 vec4 highWaterLevelColor = vec4(204, 102, 0, 255) / 255.0;
 
 
-float TIME_SLOW = 10000.0f;
-
 float customHeight(vec4 pos) {
+  float TIME_SLOW = clamp(1.0f, 10000.0f, 10000.f - 10000.0f * float(u_TimeSpeed) / 10.0f);
   float f = 2.0;
   float a = 2.0;
 

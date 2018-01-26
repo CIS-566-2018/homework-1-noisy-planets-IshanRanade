@@ -15,6 +15,7 @@ import {vec4, mat4} from 'gl-matrix';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
+  Time: 1.0,
 };
 
 let icosphere: Icosphere;
@@ -48,16 +49,6 @@ function changeColor(hex: string) {
   coolShader.changeColor(vec4.fromValues(rgb.r,rgb.g,rgb.b,1));
 }
 
-function changeShaderProgram(program: string) {
-  if (program == "Lambert") {
-    currentShader = lambertShader;
-  } else if (program == "Cool") {
-    currentShader = coolShader;
-  } else if(program == "Planet") {
-    currentShader = planetShader;
-  }
-}
-
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 2, 8);
   icosphere.create();
@@ -65,6 +56,11 @@ function loadScene() {
   // square.create();
   //  cube = new Cube(vec3.fromValues(0,0,0));
   //  cube.create();
+}
+
+function changeTimeSpeed(time: number) {
+  currentShader.setTimeSpeed(time);
+  liquidShader.setTimeSpeed(time);
 }
 
 function main() {
@@ -78,11 +74,7 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 9).step(1);
-  gui.add(controls, 'Load Scene');
-  gui.add({'Shader': 'Planet'}, 'Shader', 
-    { 'Lambert': 'Lambert', 'Cool': 'Cool', 'Planet': 'Planet' }).onChange(changeShaderProgram);
-  gui.addColor({'Lambert Color': "#1861b3" }, 'Lambert Color').onChange(changeColor);
+  gui.add(controls, 'Time', 1, 10).onChange(changeTimeSpeed);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -103,15 +95,15 @@ function main() {
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
   gl.enable(gl.DEPTH_TEST);
 
-  lambertShader = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
-  ]);
+  // lambertShader = new ShaderProgram([
+  //   new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
+  //   new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
+  // ]);
 
-  coolShader = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/cool-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/cool-frag.glsl')),
-  ]);
+  // coolShader = new ShaderProgram([
+  //   new Shader(gl.VERTEX_SHADER, require('./shaders/cool-vert.glsl')),
+  //   new Shader(gl.FRAGMENT_SHADER, require('./shaders/cool-frag.glsl')),
+  // ]);
 
   planetShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
